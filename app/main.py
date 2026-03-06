@@ -2,32 +2,32 @@ from fastapi import FastAPI
 import joblib
 import pandas as pd
 from src.preprocessing import data_preprocessing
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["OPTIONS", "POST", "GET"],
+    allow_headers=["*"],
+)
+
 Logistic_Reg_model = joblib.load('models/loan_model.pkl')
+print("Model successfully loaded")
 
-input_data = {
-    "Gender": "Male",
-    "Married": "Yes",
-    "Education": "Graduate",
-    "Self_Employed": "No",
-    "Applicant_Income": 5000,
-    "Coapplicant_Income": 2000,
-    "Loan_Amount": 150,
-    "Loan_Amount_Term": 360,
-    "Credit_History": 1,
-    "Property_Area": "Urban"
-}
+@app.post('/predict')
+def predict(input_data: dict):
+    df = pd.DataFrame([input_data])
 
-df = pd.DataFrame([input_data])
+    proccess_df = data_preprocessing(df, training=False)
+    #load features
+    features = joblib.load("models/feature_columns.pkl")
+    #reindex after data preprocessing
+    proccess_df = proccess_df.reindex(columns=features, fill_value=0)
+    prediction = Logistic_Reg_model.predict(proccess_df)
+    return {"prediction" : int(prediction[0])}
 
-proccess_df = data_preprocessing(df, training=False)
-#load features
-features = joblib.load("models/feature_columns.pkl")
-#reindex after data preprocessing
-proccess_df = proccess_df.reindex(columns=features, fill_value=0)
-prediction = Logistic_Reg_model.predict(proccess_df)
 
-print(prediction[0])
 
