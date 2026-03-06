@@ -27,6 +27,8 @@ def predict(input_data: dict):
     #reindex after data preprocessing
     proccess_df = proccess_df.reindex(columns=features, fill_value=0)
     prediction = Logistic_Reg_model.predict(proccess_df)
+
+    print(prediction[0])
     return {"prediction" : int(prediction[0])}
 
 
