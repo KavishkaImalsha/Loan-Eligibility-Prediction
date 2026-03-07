@@ -68,8 +68,8 @@ const LoanEligibilityForm = () => {
         {/* Result Banner */}
         {result && (
           <div className={`mb-8 p-4 rounded-xl text-center font-semibold text-lg animate-fade-in-down ${
-            result.status === 'error' ? 'bg-red-100 text-red-700' : 
-            result
+            !result.data ? 'bg-red-100 text-red-700' : 
+            result.data
             ? 'bg-green-100 text-green-700 border border-green-200' 
             : 'bg-orange-100 text-orange-700 border border-orange-200'
           }`}>
